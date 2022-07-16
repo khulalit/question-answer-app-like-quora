@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+        <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <link rel="stylesheet" href="index.css">
+    <title>Answer
+    </title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-sm   navbar-light bg-light nav">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+          <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">About</a>
+            </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Contact Us</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/auth/local">Login</a>
+          </li>
+          </ul>
+        </div>
+      </nav>
+    <div class="container mt-3">
+        <div class="card mb-3" style="width: 100%;">
+            <ul class="list-group list-group-flush" id="list">
+              
+            </ul>
+          </div>
+        <form method="post" action="/api/answer" class="panel-activity__status" id="ansform">
+            <textarea name="answer" placeholder="Post Your answer..." class="form-control"></textarea>
+            <div class="actions">
+                
+                <button type="submit" class="btn btn-sm btn-rounded btn-info">
+                    Post
+                </button>
+            </div>
+        </form>
+    </div>
+    <script>
+      window.addEventListener('load',()=>{
+        let qid = window.location.search
+        qid = qid.substring(5)
+        console.log(qid)
+        fetch(`/api/answer/${qid}`)
+        .then(res=>res.json())
+        .then(data=>{
+
+              data.forEach(element => {
+                document.getElementById('list').innerHTML += `<li class="list-group-item w-auto" id="list-1">${element.content}</li>`
+                
+              });
+        })
+        .catch(err=>{
+          document.getElementById('list').innerHTML += `<li class="list-group-item w-auto" id="list-1">No Answer Till now</li>`
+        })
+      })
+      document.getElementById('ansform').addEventListener('submit',(e)=>{
+          e.preventDefault();
+          e.target.action = "/seeanswer?qid=1"
+          let s = window.location.search
+          console.log(s.substring(5))
+          e.target.action = "/api/answer/"+s.substring(5)
+          console.log(e.target.action)
+          e.target.submit();
+      })
+    </script>
+</body>
+</html>

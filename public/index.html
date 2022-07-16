@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+        <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <link rel="stylesheet" href="index.css">
+    <title>Document</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-sm   navbar-light bg-light nav">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+          <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">About</a>
+            </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/profile">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/login">Login</a>
+          </li>
+          <li class="nav-item">
+            Logged In as user : <h4 id="username">Not Logged in</h4>
+          </li>
+          </ul>
+        </div>
+      </nav>
+    <div class="container">
+        <div class="col-lg-8"> 
+            <div class="panel">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Home</h3>
+                </div>
+                <div class="panel-content panel-activity" id="container">
+                    <form action="/question" method="post" class="panel-activity__status">
+                        <textarea name="question" placeholder="Post Your question..." class="form-control"></textarea>
+                        <div class="actions">
+                            
+                            <button type="submit" class="btn btn-sm btn-rounded btn-info">
+                                Post
+                            </button>
+                        </div>
+                    </form>
+                    <div class="contain pb-3">
+                        <ul class="panel-activity__list pb-5" id="list">
+                            
+
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card" id="answer">
+        <div class="card-header">Answer</div>
+        <div class="card-body" id="contentanswer">Content</div>
+        <div class="card-footer"><button class="btn btn-danger" onclick="closefunction()">Close</button></div>
+      </div>
+    <script src="./main.js"></script>
+</body>
+</html>
