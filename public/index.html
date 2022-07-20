@@ -11,31 +11,28 @@
     <title>Document</title>
 </head>
 <body>
-    <nav class="navbar navbar-expand-sm   navbar-light bg-light nav">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
+    <div class="navbar">
+      <div class="button-menu">
 
-        <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
-          <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-            <li class="nav-item">
-              <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">About</a>
-            </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/profile">Profile</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/login">Login</a>
-          </li>
-          <li class="nav-item">
-            Logged In as user : <h4 id="username">Not Logged in</h4>
-          </li>
-          </ul>
+      </div>
+      <div class="logo">
+        <h1>QnA</h1>
+      </div>
+      <div class="links d-flex flex-row m-3">
+        <div class="profile">
+          <a href="/" class="nav-link m-3">Home</a>
         </div>
-      </nav>
+        <div class="profile">
+          <a href="/profile" class="nav-link m-3">Profile</a>
+        </div>
+        <div class="profile">
+          <a href="/" class="nav-link m-3">About Us</a>
+        </div>
+        <div class="profile">
+          <a href="/login" class="nav-link btn btn-danger m-3 p-1 pl-2 pr-2 text-white">Login</a>
+        </div>
+      </div>
+    </div>
     <div class="container">
         <div class="col-lg-8"> 
             <div class="panel">
@@ -55,7 +52,7 @@
                     <div class="contain pb-3">
                         <ul class="panel-activity__list pb-5" id="list">
                             
-
+                          
                         </ul>
                     </div>
                 </div>

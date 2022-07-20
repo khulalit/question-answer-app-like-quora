@@ -12,7 +12,7 @@ window.addEventListener('load',()=>{
                     <h5 id="question">
                         ${e.content}
                     </h5>
-                    <button class="btn btn-sm btn-rounded btn-info ans" id="${e.id}">See All Answer? Post answer</button>
+                    <button class="btn btn-sm btn-rounded btn-info ans" id="${e.id}">See All Answer or Post answer</button>
                     
                 </div>
                 </div>

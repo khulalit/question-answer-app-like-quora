@@ -1,4 +1,8 @@
 /* Profile_page */
+@import url('https://fonts.googleapis.com/css2?family=Rubik+Moonrocks&display=swap');
+.logo{
+    font-family: 'Rubik Moonrocks', cursive;
+}
 #answer{
     display: none;
     width: 80%;
@@ -7,11 +11,21 @@
 #container{
     padding-bottom: 20px;
 }
-.nav{
+.navbar{
     position: sticky;
     top: 0;
-    background-color: white;
-    z-index: 5;
+    background-color: #f1f1f1;
+    z-index: 3;
+    display: flex;
+    justify-content:space-between;
+}
+.nav-link:hover{
+    text-decoration: underline;
+}
+
+.nav-inside{
+    display: flex;
+    justify-content: flex-end;
 }
 body{
     background:#dcdcdc;
