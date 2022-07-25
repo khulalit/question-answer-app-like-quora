@@ -1,16 +1,24 @@
-const mysql = require('mysql');
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
+const bcrypt = require('bcrypt');
+const fileUpload = require('express-fileupload');
+const transporter = require('./utilities/nodemailer')
+const pages = require('./routes/pages/pages')
+const auth = require('./routes/apis/auth')
+const postquestion = require('./routes/apis/question')
+const getroutes = require('./routes/apis/getroutes')
+const uploadroute = require('./routes/apis/uploadroute')
+const connection = require('./database/dbconfig')
+const updateAns = require('./routes/apis/updateAns')
+const deleteroute = require('./routes/apis/delete')
+const {checkAuth, checkAuthwithMessage, checkAuthwithMessage_} = require('./utilities/authchecker')
+// setting up global dirname so that it cant always point to root
+global.dirname = __dirname;
+// compaare
 
+// app instance
 const app = express();
-
-const connection = mysql.createConnection({
-	host     : 'localhost',
-	user     : 'root',
-	password : 'password',
-	database : 'qna'
-});
 app.use(session({
 	secret: 'secret',
 	resave: true,
@@ -19,181 +27,93 @@ app.use(session({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '/public/static')));
+app.use(express.static(path.join(__dirname, '/uploads/images')));
+app.use(fileUpload())
+app.use(auth)
+app.use(pages)
+app.use(postquestion)
+app.use(uploadroute)
+app.use(deleteroute)
+app.use(getroutes)
+app.use(updateAns)
 
 
-// function to check auth
-function checkAuth(req,res,next) {
-    if(req.session.loggedin == true)
-        next();
-    else 
-        res.redirect('/login');
+function validatepass(req,res,next) {
+    let password = req.body.password;
+    const passregex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/
+    // console.log(password)
+    if(!passregex.test(password))
+        return res.send("password must be of length 8 and must have atleast upercase letter and one special char")
+    next()
 }
-function checkAuthwithMessage(req,res,next) {
-    if(req.session.loggedin == true)
-        next();
-    else 
-        res.send(403);
-}
-//
-function queryget() {
-    connection.query(select )
-}
-
-// http://localhost:3000/
-app.get('/login', function(request, response) {
-	// Render login template
-	response.sendFile(path.join(__dirname + '/public/login.html'));
-});
-// http://localhost:3000/auth
-app.post('/auth', function(request, response) {
-	// Capture the input fields
-	let username = request.body.username;
-	let password = request.body.password;
-	// Ensure the input fields exists and are not empty
-	if (username && password) {
-		// Execute SQL query that'll select the account from the database based on the specified username and password
-		connection.query('SELECT * FROM accounts WHERE username = ? AND password = ?', [username, password], function(error, results, fields) {
-			// If there is an issue with the query, output the error
-			if (error) throw error;
-			// If the account exists
-			if (results.length > 0) {
-				// Authenticate the user
-				request.session.loggedin = true;
-				request.session.username = username;
-                request.session.userid = results[0].id
-                
-				// Redirect to home page
-				response.redirect('/');
-			} else {
-				response.send('Incorrect Username and/or Password!');
-			}			
-			response.end();
-		});
-	} else {
-		response.send('Please enter Username and Password!');
-		response.end();
-	}
-});
-
-app.post('/question',checkAuthwithMessage,(req,res)=>{
-    const userid = req.session.userid;
-
-    connection.query("insert into ques(content,created_by) values( ? , ?);",[req.body.question,userid],function(error, results, fields) {
-        // If there is an issue with the query, output the error
-        if (error){
-            console.log(err);
-            res.sendStatus(500);
-        };
-        // If the account exists
-        res.redirect('/');
-    });
-});
-app.post('/register',(req,res)=>{
-    connection.query("select username,email from accounts where username = ? or email = ?",[req.body.username,req.body.email],(err,result,fields)=>{
+function uniqueemail(req,res,next) {
+    console.log("unique  email")
+    console.log(req.body)
+    connection.query("select username from accounts where email = ?",[req.body.email],(err,result,fields)=>{
         if(err)
-            throw error;
-        if(result.length === 0)
-        connection.query("insert into ques(content,created_by) values( ? , ?);",[req.body.username,userid],function(error, results, fields) {
+            console.log(err);
+        if(result.length === 0){
+            console.log("Going to next")
+            next();
+        }
+        else 
+            res.send({status : false , message : "Email has aleady taken"});
+    });
+}
+app.post('/register',validatepass,(req,res)=>{
+    // console.log("hit here")
+    const password = req.body.password
+    const code = req.body.code
+    const email = req.session.email
+    const name = req.body.username
+    console.log(req.body)
+    console.log(email)
+    if(req.session.vericode == code)
+    bcrypt.hash(password, 10, function(err, hash) {
+        // Store hash in your password DB.
+        connection.query("insert into accounts(username,email,password,cover) values( ? , ? , ?, ?);",[name,email,hash,"no"],function(error, results, fields) {
             // If there is an issue with the query, output the error
             if (error){
-                console.log(err);
-                res.sendStatus(500);
-            };
+                console.log(error);
+                // res.sendStatus(500);
+            }
             // If the account exists
-            res.redirect('/');
+            else {
+                // req.session.destroy()
+                console.log(results.insertId)
+                req.session.userid = results.insertId
+                res.redirect('/pages/fileupload')
+            }
         });
-        else 
-            res.send("username of email already taken");
     });
+    else res.send("Your email verification is falid ")
 });
-app.get('/home',checkAuth,(req,res)=>{
-    res.send("This is home");
+app.post('/verifyemail',uniqueemail,(req,res)=>{
+    console.log("verifying email")
+    const random = Math.floor(1000 + Math.random() * 9000);
+    transporter.sendMail({
+        from: '"Admin do-not reply" <lalitkhudhania2@gmail.com>', // sender address
+        to: req.body.email, // list of receivers
+        subject: 'Welcome!',
+        template: 'email', // the name of the template file i.e email.handlebars
+        context:{
+            name: "QNA", // replace {{name}} with Adebola
+            company: 'Qna' // replace {{company}} with My Company
+        },
+        text : "Your verification code is : "+random
+    },(err,respn)=>{
+        if(err)
+            res.send("Your email is not valid or something went wrong.")
+        console.log("email verified")
+        req.session.vericode = random
+        req.session.email = req.body.email
+        res.send({status : true, message : "Your verification code has been sent to your email id please proceed "})
+    })
+    
 });
 app.get('/',(req,res)=>{
     res.sendFile(path.join(__dirname + '/public/index.html'));
     
-});
-app.get('/api/questions',(req,res)=>{
-    connection.query("select content , username, ques.id from ques, accounts where ques.created_by = accounts.id;",(err,result,fields)=>{
-        if(err)
-            res.send(500);
-        if(result.length>0){
-            res.send(result)
-        }
-        else
-            res.send("Nothing here help post quesiton ")
-    });
-});
-app.get('/api/answer/:id',(req,res)=>{
-    connection.query("select content from ans where qid = ?;",[req.params.id],(err,result,fields)=>{
-        if(err)
-            res.send(500);
-        if(result.length>0){
-            console.log(result);
-            res.send(result)
-        }
-        else
-            res.send("Nothing here help post quesiton ")
-    });
-});
-app.get('/api/qa',checkAuthwithMessage,(req,res)=>{
-    connection.query('select ques.content as "ques", ans.content as "ans" from ques right join ans on ques.id = ans.qid where ans.uid = ?',[req.session.userid],(err,result,fields)=>{
-        if(err){
-            res.send(500);
-            // console.log(err)
-        }
-        if(result.length>0){
-            res.send(result);
-        }
-        else
-            res.send("nothing")
-    });
-
-});
-app.get('/api/q',checkAuthwithMessage,(req,res)=>{
-    if(typeof req.session.userid != 'undefined' )
-    connection.query('select ques.content as "question" from ques where ques.created_by = ?',[req.session.userid],(err,result,fields)=>{
-        if(err){
-            console.log(err)
-            return res.send(500);
-            // console.log(err)
-        }
-        if(result){
-            res.send(result);
-        }
-        else
-            res.send("nothing")
-    });
-    else
-        res.send({message : "login"});
-    // res.send("uid");
-});
-//
-app.get('/userinfo',checkAuth,(req,res)=>{
-        connection.query('select id, username, email from accounts where id = ?',[req.session.userid],(err,result,fields)=>{
-            if(err)
-                return res.send(500)
-            if(result.length > 0)
-                return res.send(result);
-            else
-                return res.send("nothing");
-        })
-});
-//
-app.get('/profile',checkAuthwithMessage,(req,res)=>{
-    res.sendFile(path.join(__dirname + '/public/profile.html'));
-});
-app.get('/:route',(req,res)=>{
-    if(req.params.route == "register")
-        res.sendFile(path.join(__dirname + '/public/register.html'));
-    else if(req.params.route == "seeanswer")
-        res.sendFile(path.join(__dirname + '/public/answer.html'));
-    else if(req.params.route =='logout'){
-        req.session.destroy();
-        res.redirect('/login');
-    }
-    else
-        res.send("404 No whare to go")
 });
 
 app.post('/api/answer/:qid',checkAuthwithMessage,(req,res)=>{
@@ -210,7 +130,9 @@ app.post('/api/answer/:qid',checkAuthwithMessage,(req,res)=>{
     });
 });
 
-
+app.get('*',(req,res)=>{
+    res.sendFile(__dirname+'/public/404.html')
+})
 app.listen(3000,()=>{
     console.log("listenisng");
 });

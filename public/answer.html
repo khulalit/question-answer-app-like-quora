@@ -7,50 +7,61 @@
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
         <!-- CSS only -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
-    <link rel="stylesheet" href="index.css">
-    <title>Answer
-    </title>
+    <link rel="stylesheet" href="/index.css">
+    <title>Answer</title>
 </head>
 <body>
-    <nav class="navbar navbar-expand-sm   navbar-light bg-light nav">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
+  <div class="navbar">
+    <div class="button-menu">
 
-        <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
-          <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-            <li class="nav-item">
-              <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">About</a>
-            </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Contact Us</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/auth/local">Login</a>
-          </li>
-          </ul>
-        </div>
-      </nav>
-    <div class="container mt-3">
-        <div class="card mb-3" style="width: 100%;">
-            <ul class="list-group list-group-flush" id="list">
-              
-            </ul>
-          </div>
-        <form method="post" action="/api/answer" class="panel-activity__status" id="ansform">
-            <textarea name="answer" placeholder="Post Your answer..." class="form-control"></textarea>
-            <div class="actions">
-                
-                <button type="submit" class="btn btn-sm btn-rounded btn-info">
-                    Post
-                </button>
-            </div>
-        </form>
     </div>
+    <div class="logo">
+      <h1>QnA</h1>
+
+    </div>
+    
+    <div class="links d-flex flex-row m-3">
+      <div class="profile">
+        <a href="/" class="nav-link m-3">Home</a>
+      </div>
+      <div class="profile">
+        <a href="/" class="nav-link m-3">About Us</a>
+      </div>
+      
+    </div>
+  </div>
+
+  <div class="container mt-3" id="cont">
+    <form method="post" action="/api/answer" class="panel-activity__status" id="ansform">
+      <div class="tinymc">
+        <textarea name="answer" id="TypeHere" placeholder="Post Your answer..." class="form-control"></textarea>
+
+      </div>
+        <div class="actions">
+            
+            <button type="submit" class="btn btn-rounded btn-secondary">
+                Post
+            </button>
+        </div>
+    </form>
+        <div class="card mb-3" style="width: 100%;" id ="frame">
+            
+        </div>
+        
+      </div>
+      <div class="card mt-4 mb-3 p-3 mx-3 " id="ansdiv" style="width: 100%; height: 80vh;display: none;">
+        <div class="ansdiv" id="displayans">
+
+        </div>
+        <hr>
+        <div class="close border-1">
+          <button class="btn btn-outline-secondary mx-3" onclick="closefunc(this)">X</button>
+        </div>
+    </div>
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
     <script>
+      tinymce.init({selector:'#TypeHere'});
+      let ans;
       window.addEventListener('load',()=>{
         let qid = window.location.search
         qid = qid.substring(5)
@@ -58,10 +69,12 @@
         fetch(`/api/answer/${qid}`)
         .then(res=>res.json())
         .then(data=>{
-
+            ans = data;
               data.forEach(element => {
-                document.getElementById('list').innerHTML += `<li class="list-group-item w-auto" id="list-1">${element.content}</li>`
-                
+                console.log(element)
+                document.getElementById('frame').innerHTML+=`<div class="w-100 p-3 border-1"><h4>${element.username}</h4><iframe frameborder="2" class="w-100" id="${element.id}" src="data:text/html,${encodeURIComponent(element.content)}"></iframe>
+                <button class='btn btn-outline-secondary' onclick="Showans(this)" id="${element.id}">></button>
+                </div>`
               });
         })
         .catch(err=>{
@@ -70,13 +83,34 @@
       })
       document.getElementById('ansform').addEventListener('submit',(e)=>{
           e.preventDefault();
-          e.target.action = "/seeanswer?qid=1"
+          e.target.action = "/pages/seeanswer?qid=1"
           let s = window.location.search
           console.log(s.substring(5))
           e.target.action = "/api/answer/"+s.substring(5)
           console.log(e.target.action)
           e.target.submit();
       })
+      function Showans(event) {
+       console.log(event.id)
+       console.log(ans)
+          document.getElementById('ansdiv').style = 'display : block';
+          document.getElementById('cont').style = 'display : none'
+          ans.forEach(element => {
+            if(element.id == event.id)
+            document.getElementById('displayans').innerHTML = element.content
+          });
+      }
+      function closefunc(e) {
+        document.getElementById('ansdiv').style = 'display : none';
+        document.getElementById('cont').style = 'display : block'
+        document.getElementById('displayans').innerText = ""
+      }
+      function fullscreen() {
+        document.getElementById('TypeHere').style = "height : 80vh;"
+      }
+      function updatefunc() {
+        
+      }
     </script>
 </body>
 </html>

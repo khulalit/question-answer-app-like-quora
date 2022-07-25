@@ -17,34 +17,52 @@
       </div>
       <div class="logo">
         <h1>QnA</h1>
+
+      </div>
+      <div class="user">
+        <h6 id="curruser">No user</h6>
       </div>
       <div class="links d-flex flex-row m-3">
         <div class="profile">
           <a href="/" class="nav-link m-3">Home</a>
         </div>
         <div class="profile">
-          <a href="/profile" class="nav-link m-3">Profile</a>
+          <a href="/p/profile" class="nav-link m-3">Profile</a>
         </div>
         <div class="profile">
           <a href="/" class="nav-link m-3">About Us</a>
         </div>
         <div class="profile">
-          <a href="/login" class="nav-link btn btn-danger m-3 p-1 pl-2 pr-2 text-white">Login</a>
+          <a href="/pages/login" id="login" class="nav-link- btn btn-secondary m-3 py-2 px-5 text-white">Login</a>
+        </div>
+        <div class="profile">
+          <a href="/pages/logout" id="logout" class="nav-link- btn btn-secondary m-3 py-2 px-5  text-white">Logout</a>
+        </div>
+        <div class="profile d-flex justify-content-center py-3">
+          <button class="btn btn-primary">
+            <a href="/pages/signup" id="login" class=" text-white m-3 p-1 pl-2 pr-2 ">Signup</a>
+
+          </button>
         </div>
       </div>
     </div>
-    <div class="container">
-        <div class="col-lg-8"> 
+    <div class="container px-3">
+        <div class="col-lg-12"> 
             <div class="panel">
                 <div class="panel-heading">
                     <h3 class="panel-title">Home</h3>
+                    
                 </div>
                 <div class="panel-content panel-activity" id="container">
+                   
+                    <span class="pb-1">
+                      You Can only post question only after logging in.
+                    </span>
                     <form action="/question" method="post" class="panel-activity__status">
                         <textarea name="question" placeholder="Post Your question..." class="form-control"></textarea>
                         <div class="actions">
                             
-                            <button type="submit" class="btn btn-sm btn-rounded btn-info">
+                            <button type="submit" class="btn btn-outline-secondary btn-rounded ">
                                 Post
                             </button>
                         </div>
@@ -59,11 +77,6 @@
             </div>
         </div>
     </div>
-    <div class="card" id="answer">
-        <div class="card-header">Answer</div>
-        <div class="card-body" id="contentanswer">Content</div>
-        <div class="card-footer"><button class="btn btn-danger" onclick="closefunction()">Close</button></div>
-      </div>
     <script src="./main.js"></script>
 </body>
 </html>

@@ -27,11 +27,11 @@
                   <div class="card">
                     <div class="card-body">
                       <div class="d-flex flex-column align-items-center text-center">
-                        <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="Admin" class="rounded-circle" width="150">
+                        <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="avatar" class="rounded-circle" width="150" id="avatar">
                         <div class="mt-3">
                           <h4 id="username">Username</h4>
                           <p class="text-secondary mb-1" id="email"></p>
-                          <button class="btn btn-primary"> <a href="/logout" class="text-white">Logout</a> </button>
+                          <button class="btn btn-primary"> <a href="/pages/logout" class="text-white text-decoration-none">Logout</a> </button>
                         </div>
                       </div>
                     </div>
@@ -59,8 +59,26 @@
               </div>
     
             </div>
+          
         </div>
+        <div class="mx-5 fixed-bottom d-none mt-3 bg-white" id="updatediv">
+          <div class="textarea h-100">
+            <form action="/api/update/ans" method="post">
+              <textarea name="answer" id="text" style="width: 100%" value="fjdlfj">
+              </textarea>
+              <input type="text" name="ansid" id="ansid">
+              <button type="submit">update</button>
+
+            </form>
+          </div>
+        </div>
+        <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
         <script>
+          let currans;
+          let loading = true;
+          tinymce.init({selector:'#text',height : '600px'}).then(()=>{
+            loading = false;
+          });
           window.addEventListener('load',()=>{
             fetch('/api/q')
             .then(res=>{
@@ -68,12 +86,14 @@
             })
             .then(data=>{
                 console.log(data)
+                
                 data.forEach(e => {
                   document.getElementById('ques').innerHTML += `<li>
                         <div class="card p-4 m-3">
                            <strong>Question :</strong><p class="card p-2">
                               ${e.question}
                            </p>
+                           <button class="btn btn-outline-danger" id="${e.id}" onclick="deleteques(this)">X</button>
                         </div>
                       </li>`
                 });
@@ -88,12 +108,13 @@
             })
             .then(data=>{
                 console.log(data)
+                currans = data;
                 data.forEach(e => {
                   document.getElementById('qa').innerHTML += `<div class="card mb-3">
                     <div class="card-body">
                        <b>Question :  </b> ${e.ques}
                        <p>${e.ans}</p>
-          
+                      <button class="btn btn-outline-primary" value="${e.id}" onclick="updatefunc(this)">Update </button><button class="btn btn-outline-danger mx-2" value="${e.id}" onclick="deleteAns(this)"> X </button>
                     </div>
                   </div>`
                 });
@@ -111,6 +132,8 @@
                 data.forEach(e => {
                   document.getElementById('username').innerText = e.username;
                   document.getElementById('email').innerText = e.email;
+                  if(e.cover === 'yes')
+                    document.getElementById('avatar').src = 'http://127.0.0.1:3000/'+e.id+'.jpeg';
                 });
             })
             .catch(err=>{
@@ -119,6 +142,39 @@
 
 
           });
+          function updatefunc(e) {
+            if(!loading){
+
+              console.log(e.value)
+              document.getElementById('ansid').value = e.value
+              document.getElementById('updatediv').classList='mx-5 fixed-bottom d-block h-100 mt-3 bg-white';
+              console.log(currans)
+              let ans = currans.forEach(element => {
+                if(element.id == e.value)
+                  tinymce.get('text').setContent(element.ans)
+                
+              });
+            }alert("Please wait")
+          }
+          function deleteques(e) {
+            console.log(e.id)
+            fetch('/delete/question/'+e.id).
+            then(res=>res.json())
+            .then(data=>{
+              if(data.message == 'ok')
+                window.location.reload();
+            })
+          }
+          function deleteAns(e) {
+            console.log(e.value)
+            fetch('/delete/ans/'+e.value).
+            then(res=>res.json())
+            .then(data=>{
+              if(data.message == 'ok')
+                window.location.reload();
+            })
+          }
+         
         </script>
 </body>
 </html>
